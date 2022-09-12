@@ -6,40 +6,40 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HW6.Models;
+using RazorPagesMovie.Models;
 
-namespace HW6.Pages.Movies
+namespace AdvModelingDemo.Pages_Movies
 {
     public class EditModel : PageModel
     {
-        private readonly HW6.Models.MovieContext _context;
+        private readonly RazorPagesMovie.Models.MovieContext _context;
 
-        public EditModel(HW6.Models.MovieContext context)
+        public EditModel(RazorPagesMovie.Models.MovieContext context)
         {
             _context = context;
         }
 
         [BindProperty]
-        public Movie Movie { get; set; }
+        public Movie Movie { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null)
+            if (id == null || _context.Movies == null)
             {
                 return NotFound();
             }
 
-            Movie = await _context.Movie.FirstOrDefaultAsync(m => m.MovieID == id);
-
-            if (Movie == null)
+            var movie =  await _context.Movies.FirstOrDefaultAsync(m => m.MovieId == id);
+            if (movie == null)
             {
                 return NotFound();
             }
+            Movie = movie;
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://aka.ms/RazorPagesCRUD.
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -55,7 +55,7 @@ namespace HW6.Pages.Movies
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!MovieExists(Movie.MovieID))
+                if (!MovieExists(Movie.MovieId))
                 {
                     return NotFound();
                 }
@@ -70,7 +70,7 @@ namespace HW6.Pages.Movies
 
         private bool MovieExists(int id)
         {
-            return _context.Movie.Any(e => e.MovieID == id);
+          return (_context.Movies?.Any(e => e.MovieId == id)).GetValueOrDefault();
         }
     }
 }

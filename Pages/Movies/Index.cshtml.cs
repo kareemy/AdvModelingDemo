@@ -5,24 +5,27 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using HW6.Models;
+using RazorPagesMovie.Models;
 
-namespace HW6.Pages.Movies
+namespace AdvModelingDemo.Pages_Movies
 {
     public class IndexModel : PageModel
     {
-        private readonly HW6.Models.MovieContext _context;
+        private readonly RazorPagesMovie.Models.MovieContext _context;
 
-        public IndexModel(HW6.Models.MovieContext context)
+        public IndexModel(RazorPagesMovie.Models.MovieContext context)
         {
             _context = context;
         }
 
-        public IList<Movie> Movie { get;set; }
+        public IList<Movie> Movie { get;set; } = default!;
 
         public async Task OnGetAsync()
         {
-            Movie = await _context.Movie.ToListAsync();
+            if (_context.Movies != null)
+            {
+                Movie = await _context.Movies.ToListAsync();
+            }
         }
     }
 }

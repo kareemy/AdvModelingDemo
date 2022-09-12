@@ -5,50 +5,54 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using HW6.Models;
+using RazorPagesMovie.Models;
 
-namespace HW6.Pages.Movies
+namespace AdvModelingDemo.Pages_Movies
 {
     public class DeleteModel : PageModel
     {
-        private readonly HW6.Models.MovieContext _context;
+        private readonly RazorPagesMovie.Models.MovieContext _context;
 
-        public DeleteModel(HW6.Models.MovieContext context)
+        public DeleteModel(RazorPagesMovie.Models.MovieContext context)
         {
             _context = context;
         }
 
         [BindProperty]
-        public Movie Movie { get; set; }
+      public Movie Movie { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null)
+            if (id == null || _context.Movies == null)
             {
                 return NotFound();
             }
 
-            Movie = await _context.Movie.FirstOrDefaultAsync(m => m.MovieID == id);
+            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.MovieId == id);
 
-            if (Movie == null)
+            if (movie == null)
             {
                 return NotFound();
+            }
+            else 
+            {
+                Movie = movie;
             }
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(int? id)
         {
-            if (id == null)
+            if (id == null || _context.Movies == null)
             {
                 return NotFound();
             }
+            var movie = await _context.Movies.FindAsync(id);
 
-            Movie = await _context.Movie.FindAsync(id);
-
-            if (Movie != null)
+            if (movie != null)
             {
-                _context.Movie.Remove(Movie);
+                Movie = movie;
+                _context.Movies.Remove(Movie);
                 await _context.SaveChangesAsync();
             }
 

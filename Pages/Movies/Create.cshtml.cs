@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using HW6.Models;
+using RazorPagesMovie.Models;
 
-namespace HW6.Pages.Movies
+namespace AdvModelingDemo.Pages_Movies
 {
     public class CreateModel : PageModel
     {
-        private readonly HW6.Models.MovieContext _context;
+        private readonly RazorPagesMovie.Models.MovieContext _context;
 
-        public CreateModel(HW6.Models.MovieContext context)
+        public CreateModel(RazorPagesMovie.Models.MovieContext context)
         {
             _context = context;
         }
@@ -24,18 +24,18 @@ namespace HW6.Pages.Movies
         }
 
         [BindProperty]
-        public Movie Movie { get; set; }
+        public Movie Movie { get; set; } = default!;
+        
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://aka.ms/RazorPagesCRUD.
+        // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
+          if (!ModelState.IsValid || _context.Movies == null || Movie == null)
             {
                 return Page();
             }
 
-            _context.Movie.Add(Movie);
+            _context.Movies.Add(Movie);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

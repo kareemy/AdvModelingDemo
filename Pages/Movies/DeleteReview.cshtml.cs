@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using HW6.Models;
+using RazorPagesMovie.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HW6.Pages.Movies
+namespace AdvModelingDemo.Pages
 {
     public class DeleteReviewModel : PageModel
     {
@@ -26,7 +26,7 @@ namespace HW6.Pages.Movies
         }
 
         // Drop down list of all the Movie Reviews
-        public SelectList Reviews {get; set;}
+        public SelectList Reviews {get; set;} = default!;
 
         // ReviewId to delete. We bind this property because the user will select it in our form and submit it.
         [BindProperty]
@@ -37,9 +37,9 @@ namespace HW6.Pages.Movies
         {
             // Get all the reviews to populate our SelectList drop down
             // Use an anonymous type because we want a new variable that shows the Movie Title and Review score
-            var reviewsWithTitles = _context.Review.Include(r => r.Movie).Select(r => new {
-                ID = r.ID,
-                Display = $"{r.Movie.Title}: {r.Score} out of 5"
+            var reviewsWithTitles = _context.Reviews.Include(r => r.Movie).Select(r => new {
+                ID = r.ReviewId,
+                Display = $"{r.Movie!.Title}: {r.Score} out of 5"
             });
             _logger.LogInformation($"DeleteReview OnGet() called. ReviewId = '{ReviewId}'. id = '{id}'");
 
@@ -57,11 +57,11 @@ namespace HW6.Pages.Movies
                 return NotFound();
             }
             // Find the review in the database
-            Review r = _context.Review.Find(ReviewId);
+            Review r = _context.Reviews.Find(ReviewId)!;
 
             if (r != null)
             {
-                _context.Review.Remove(r); // Delete the review
+                _context.Reviews.Remove(r); // Delete the review
                 _context.SaveChanges();
             }
 

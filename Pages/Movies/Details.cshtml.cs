@@ -5,35 +5,39 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using HW6.Models;
+using RazorPagesMovie.Models;
 
-namespace HW6.Pages.Movies
+namespace AdvModelingDemo.Pages_Movies
 {
     public class DetailsModel : PageModel
     {
-        private readonly HW6.Models.MovieContext _context;
+        private readonly RazorPagesMovie.Models.MovieContext _context;
 
-        public DetailsModel(HW6.Models.MovieContext context)
+        public DetailsModel(RazorPagesMovie.Models.MovieContext context)
         {
             _context = context;
         }
 
-        public Movie Movie { get; set; }
-        [BindProperty]
-        public int ReviewIdToDelete {get; set;}
+      public Movie Movie { get; set; } = default!; 
+
+      [BindProperty]
+      public int ReviewIdToDelete {get; set;}
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null)
+            if (id == null || _context.Movies == null)
             {
                 return NotFound();
             }
 
-            Movie = await _context.Movie.Include(m => m.Reviews).FirstOrDefaultAsync(m => m.MovieID == id);
-
-            if (Movie == null)
+            var movie = await _context.Movies.Include(m => m.Reviews).FirstOrDefaultAsync(m => m.MovieId == id);
+            if (movie == null)
             {
                 return NotFound();
+            }
+            else 
+            {
+                Movie = movie;
             }
             return Page();
         }
@@ -46,7 +50,7 @@ namespace HW6.Pages.Movies
             }
 
             // Find the review in the database
-            Review Review = _context.Review.FirstOrDefault(r => r.ID == ReviewIdToDelete);
+            var Review = _context.Reviews.FirstOrDefault(r => r.ReviewId == ReviewIdToDelete);
             
             if (Review != null)
             {
@@ -54,9 +58,9 @@ namespace HW6.Pages.Movies
                 _context.SaveChanges();
             }
 
-            Movie = _context.Movie.Include(m => m.Reviews).FirstOrDefault(m => m.MovieID == id);
+            Movie = _context.Movies.Include(m => m.Reviews).First(m => m.MovieId == id);
 
             return Page();
-        }        
+        }   
     }
 }

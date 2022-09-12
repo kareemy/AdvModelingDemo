@@ -1,43 +1,41 @@
-using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
-using System.Collections.Generic;
 
-namespace HW6.Models
+namespace RazorPagesMovie.Models
 {
     public static class SeedData
     {
         public static void Initialize(IServiceProvider serviceProvider)
         {
-            using (var db = new MovieContext(serviceProvider.GetRequiredService<DbContextOptions<MovieContext>>()))
+            using (var context = new MovieContext(
+                serviceProvider.GetRequiredService<
+                    DbContextOptions<MovieContext>>()))
             {
-                if (db.Movie.Any())
+                if (context == null || context.Movies == null)
                 {
-                    return;
+                    throw new ArgumentNullException("Null RazorPagesMovieContext");
                 }
 
-                db.Movie.AddRange(
+                // Look for any movies.
+                if (context.Movies.Any())
+                {
+                    return;   // DB has been seeded
+                }
+
+                context.Movies.AddRange(
                     new Movie
                     {
                         Title = "When Harry Met Sally",
                         ReleaseDate = DateTime.Parse("1989-2-12"),
                         Genre = "Romantic Comedy",
-                        Price = 7.99M,
-                        Rating = "R",
-                        Reviews = new List<Review> {
-                            new Review { Score = 5},
-                            new Review { Score = 1}
-                        }
+                        Price = 7.99M
                     },
 
                     new Movie
                     {
-                        Title = "Ghostbusters",
+                        Title = "Ghostbusters ",
                         ReleaseDate = DateTime.Parse("1984-3-13"),
                         Genre = "Comedy",
-                        Price = 8.99M,
-                        Rating = "PG",
+                        Price = 8.99M
                     },
 
                     new Movie
@@ -45,8 +43,7 @@ namespace HW6.Models
                         Title = "Ghostbusters 2",
                         ReleaseDate = DateTime.Parse("1986-2-23"),
                         Genre = "Comedy",
-                        Price = 9.99M,
-                        Rating = "PG-13"
+                        Price = 9.99M
                     },
 
                     new Movie
@@ -54,11 +51,10 @@ namespace HW6.Models
                         Title = "Rio Bravo",
                         ReleaseDate = DateTime.Parse("1959-4-15"),
                         Genre = "Western",
-                        Price = 3.99M,
-                        Rating = "G"
+                        Price = 3.99M
                     }
                 );
-                db.SaveChanges();
+                context.SaveChanges();
             }
         }
     }
